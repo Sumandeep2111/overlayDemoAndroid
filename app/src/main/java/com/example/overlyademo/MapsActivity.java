@@ -104,9 +104,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void setMarker(Location location){
         LatLng userLatLng = new LatLng(location.getLatitude(),location.getLongitude());
-        MarkerOptions options = new MarkerOptions().position(userLatLng).title("your Destinstion").snippet("you are going there").draggable(true);
-        destMarker = mMap.addMarker(options);
+        MarkerOptions options = new MarkerOptions().position(userLatLng).title("your Destination").snippet("you are going there").draggable(true);
+
+        if (destMarker == null){
+            destMarker = mMap.addMarker(options);
+        }else {
+            clearMap();
+            destMarker = mMap.addMarker(options);
+        }
+
     }
+
+
     @SuppressLint("MissingPermission")
     private void getLocation(){
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,0,locationListener);
@@ -139,5 +148,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
        MarkerOptions options = new MarkerOptions().position(userlocation).title("My Location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)).snippet("you are here");
        homeMarker = mMap.addMarker(options);
        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userlocation,15));
+    }
+
+    private void clearMap(){
+        if (destMarker != null){
+            destMarker.remove();
+            destMarker = null;
+        }
     }
 }
