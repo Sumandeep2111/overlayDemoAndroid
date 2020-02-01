@@ -23,8 +23,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -36,6 +40,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     Polyline line;
     Polygon shape;
+    private final int SHAPE_POINTS = 3;
+    List<Marker>markers = new ArrayList<>();
 
     LocationManager locationManager;
     LocationListener locationListener;
@@ -111,7 +117,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void setMarker(Location location){
         LatLng userLatLng = new LatLng(location.getLatitude(),location.getLongitude());
         MarkerOptions options = new MarkerOptions().position(userLatLng).title("your Destination").snippet("you are going there").draggable(true);
-
+/*
         if (destMarker == null){
             destMarker = mMap.addMarker(options);
 
@@ -121,7 +127,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         }
         drawLine();
+        */
 
+        /*
+        *this checks if there are already the same number of markers as
+        * the polygon points, so we clear the map
+        * /
+*/
+     if (markers.size() == SHAPE_POINTS){
+         clearMap();
+         markers.add(mMap.addMarker(options));
+     }
+     markers.add(mMap.addMarker(options));
+        if (markers.size() == SHAPE_POINTS){
+            drawShape();
+        }
     }
 
 
@@ -170,11 +190,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     private void clearMap(){
-        if (destMarker != null){
-            destMarker.remove();
-            destMarker = null;
-        }
-        line.remove();
+//        if (destMarker != null){
+//            destMarker.remove();
+//            destMarker = null;
+//        }
+//        line.remove();
+        for (Marker marker : markers)
+            marker.remove();
+
+        markers.clear();
+        shape.remove();
+        shape = null;
+
     }
 
 
@@ -183,5 +210,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .add(homeMarker.getPosition()).add(destMarker.getPosition())
                 .color(Color.BLUE).width(5);
         line = mMap.addPolyline(options);
+    }
+
+    private void drawShape(){
+        PolygonOptions options = new PolygonOptions()
+                .fillColor(0x330000FF).strokeWidth(5).strokeColor(Color.MAGENTA);
+
+        for (int i = 0; i < SHAPE_POINTS;i++)
+            options.add(markers.get(i).getPosition());
+
+        shape = mMap.addPolygon(options);
     }
 }
