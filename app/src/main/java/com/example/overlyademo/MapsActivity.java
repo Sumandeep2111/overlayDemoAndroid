@@ -8,6 +8,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -23,6 +24,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -58,6 +60,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -102,16 +106,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
+
+
     private void setMarker(Location location){
         LatLng userLatLng = new LatLng(location.getLatitude(),location.getLongitude());
         MarkerOptions options = new MarkerOptions().position(userLatLng).title("your Destination").snippet("you are going there").draggable(true);
 
         if (destMarker == null){
             destMarker = mMap.addMarker(options);
+
         }else {
             clearMap();
             destMarker = mMap.addMarker(options);
+
         }
+        drawLine();
 
     }
 
@@ -124,15 +133,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setHomeLocation(lastKnownLocation);
     }
 
+
+
     private  void requestPermision(){
         ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},REQUEST_CODE);
 
     }
 
+
+
     private boolean checkPermission(){
         int permissionStatus = ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION);
         return permissionStatus == PackageManager.PERMISSION_GRANTED;
     }
+
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -142,6 +157,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
     }
+
+
+
     private void setHomeLocation(Location location){
      //  mMap.clear();
        LatLng userlocation = new LatLng(location.getLatitude(),location.getLongitude());
@@ -150,10 +168,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userlocation,15));
     }
 
+
     private void clearMap(){
         if (destMarker != null){
             destMarker.remove();
             destMarker = null;
         }
+        line.remove();
+    }
+
+
+    private void drawLine(){
+        PolylineOptions options = new PolylineOptions()
+                .add(homeMarker.getPosition()).add(destMarker.getPosition())
+                .color(Color.BLUE).width(5);
+        line = mMap.addPolyline(options);
     }
 }
