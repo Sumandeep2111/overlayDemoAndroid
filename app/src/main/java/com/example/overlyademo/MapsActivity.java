@@ -66,7 +66,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-
+                //set the home location
+                setHomeLocation(location);
             }
 
             @Override
@@ -88,6 +89,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             requestPermision();
         else
             getLocation();
+        //long press on map
+        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener(){
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                Location location = new Location("your Destination");
+                location.setLatitude(latLng.latitude);
+                location.setLongitude(latLng.longitude);
+                //set marker
+                setMarker(location);
+            }
+        });
+    }
+
+    private void setMarker(Location location){
+        LatLng userLatLng = new LatLng(location.getLatitude(),location.getLongitude());
+        MarkerOptions options = new MarkerOptions().position(userLatLng).title("your Destinstion").snippet("you are going there").draggable(true);
+        destMarker = mMap.addMarker(options);
     }
     @SuppressLint("MissingPermission")
     private void getLocation(){
@@ -116,7 +134,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
     private void setHomeLocation(Location location){
-       mMap.clear();
+     //  mMap.clear();
        LatLng userlocation = new LatLng(location.getLatitude(),location.getLongitude());
        MarkerOptions options = new MarkerOptions().position(userlocation).title("My Location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)).snippet("you are here");
        homeMarker = mMap.addMarker(options);
